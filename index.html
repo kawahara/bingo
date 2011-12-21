@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+body {
+    padding: 10px;
+}
+#stage {
+    height: 400px;
+    width: 100%;
+    font-family: Impact,Charcoal;
+}
+#current {
+    height: 100%;
+    width: 40%;
+    float: left;
+    font-size: 19em;
+}
+#current div {
+    border-radius: 200px;
+    -webkit-border-radius: 200px;
+    -moz-border-radius: 200px;
+    text-align: center;
+    width: 350px;
+    display: block;
+    background-color: #BB0F0F;
+    color: white;
+}
+#log {
+    height: 100%;
+    width: 60%;
+    float: left;
+    font-size: 3em;
+    color: white;
+}
+#log div {
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    padding: 5px 20px;
+    margin: 5px;
+    line-height: 1.5em;
+    background-color: #0F0FBB;
+    width: 50px;
+    text-align: center;
+    float: left;
+}
+        </style>
+        <script type="text/javascript" src="jquery-ui/js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+        <script type="text/javascript">
+// <!CDATA[[
+$(document).ready(function(){
+    var first = true;
+    var current = $("#current div");
+    var logelm = $('#log');
+    var log = function(msg) {
+        var logitem = $('<div>').text(msg).hide();
+        logelm.prepend(logitem);
+        logitem.show('scale');
+    }
+    var out = function(event1) {
+        $(event1.target).unbind("click", out);
+        if ($("#remain").val() != "") {
+            var remain = $("#remain").val().split("\n");
+            var random = Math.floor(Math.random() * remain.length);
+            var r = remain.splice(random, 1);
+            if (!first) log(current.text());
+            $('#remain').val(remain.join("\n"));
+            current.hide('slide', {}, null, function(event2) {
+                current.text(r[0]);
+                current.show('scale');
+                $(event1.target).bind("click", out);
+            });
+            first = false;
+        } else if (!first) {
+            first = true;
+            current.hide('slide', {}, null, function(event2) {
+                log(current.text());
+                current.text("!");
+                current.show('scale');
+                $(event1.target).bind("click", out);
+            });
+        } else {
+            $(event1.target).bind("click", out);
+        }
+    };
+    current.click(out);
+    var resetRemain = function() {
+        var r = [];
+        var min = parseInt($('#min').val());
+        var max = parseInt($('#max').val());
+        for (i = min; i <= max; i++) {
+            r.push(i);
+        }
+        $('#remain').val(r.join("\n"));
+     }
+     resetRemain();
+});
+// ]]>
+        </script>
+    </head>
+    <body>
+        <section id="stage">
+            <div id="current"><div>!</div></div>
+            <div id="log"></div>
+        </section>
+        <section>
+            <div id="setting">
+                <form>
+                    <div><input type="number" id="min" value="1" required /></div>
+                    <div><input type="number" id="max" value="75" required /></div>
+                </form>
+                <textarea id="remain"></textarea>
+            </div>
+        </section>
+    </body>
+</html>
